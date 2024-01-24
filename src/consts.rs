@@ -1,3 +1,4 @@
+pub const LOAD: &str = "Load List from File";
 pub const BUILD: &str = "Build Max-Heap";
 pub const PRINT: &str = "Print";
 pub const EXTRACT: &str = "Extract Max";
