@@ -2,7 +2,7 @@ use regex::Regex;
 use std::{fs::read_to_string, path::PathBuf};
 use anyhow::{bail, Context, Result};
 
-pub fn parse_list_file(path: PathBuf) -> Result<String>{
+pub fn file_to_nodes(path: PathBuf) -> Result<Vec<i32>>{
     // Read the data from the file
     let file_data = read_to_string(path).context("Unable to read the list file.")?;
 
@@ -13,5 +13,6 @@ pub fn parse_list_file(path: PathBuf) -> Result<String>{
                 Make sure it only contains digits and commas, example: 1,2,3,4,5,6")
     }
 
-    Ok(file_data)
+    let nodes: Vec<i32> = file_data.split(',').map(|num| num.parse().expect("must be a digit, cannot panic")).collect();
+    Ok(nodes)
 }
