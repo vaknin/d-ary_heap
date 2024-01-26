@@ -21,18 +21,16 @@ pub fn parse_file_to_nodes(path: PathBuf) -> Result<Vec<i32>>{
 
 pub fn main_menu(heap_is_empty: bool) -> String {
     // Build the menu options
-    let mut menu_selections = vec![LOAD];
+    let mut menu_selections = vec![];
     if !heap_is_empty {
         menu_selections.append(&mut vec![
-            BUILD,
             PRINT,
             EXTRACT,
-            INSERT,
             INCREASE,
-            REMOVE
+            DELETE
         ]);
     }
-    menu_selections.push(QUIT);
+    menu_selections.append(&mut vec![LOAD, INSERT, QUIT]);
 
     // Wait for user input
     let selection = Select::new()
@@ -54,4 +52,18 @@ pub fn prompt_filepath(heap: Dheap) -> Result<Dheap> {
     let nodes = parse_file_to_nodes(PathBuf::from(filepath))?;
     let heap = Dheap::new(heap.d, nodes);
     Ok(heap)
+}
+
+pub fn increase_key_prompt() -> (usize, i32) {
+
+    let i: usize = Input::new()
+        .with_prompt("Enter the index to increase")
+        .interact_text()
+        .unwrap();
+
+    let key: i32 = Input::new()
+        .with_prompt("Enter the new key")
+        .interact_text()
+        .unwrap();
+    (i, key)
 }
