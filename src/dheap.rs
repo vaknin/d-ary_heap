@@ -1,22 +1,18 @@
 use core::panic;
-use std::cmp::min;
-
 use dialoguer::Input;
 
 pub struct Dheap {
     pub d: usize,
-    pub nodes: Vec<i32>,
-    pub height: usize
+    pub nodes: Vec<i32>
 }
 
 impl Dheap {
     /// Creates a new D-ary heap with specified branching factor and nodes.
     ///
     /// Initializes the heap with a given branching factor (d) and a vector of nodes.
-    /// Calculates the height of the heap and then builds a max-heap from the provided nodes.
+    /// Builds a max-heap from the provided nodes.
     pub fn new(d: usize, nodes: Vec<i32>) -> Self {
-        let height = (((nodes.len() * (d - 1) + 1) as f32).log(d as f32).ceil() - 1.0) as usize;
-        let mut heap = Dheap { d, nodes, height };
+        let mut heap = Dheap { d, nodes };
         heap.build_max_heap();
         heap
     }
@@ -47,7 +43,7 @@ impl Dheap {
     /// Iterates over each non-leaf node in reverse order and applies `max_heapify` to each,
     /// building a valid max-heap from the bottom up.
     pub fn build_max_heap(&mut self) {
-        let non_leaf_nodes = (self.nodes.len() as f32 / self.d as f32).floor() as usize; // there are floor(n/d) non-leaf nodes
+        let non_leaf_nodes = (self.nodes.len() as f32 / self.d as f32).ceil() as usize;
         for i in (0..non_leaf_nodes).rev() {
             self.max_heapify(i);
         }
@@ -105,7 +101,7 @@ impl Dheap {
     /// Validates the existence of the index and ensures the new key is greater than the current key.
     /// Updates the key and restructures the heap to maintain the max-heap property.
     /// Prints an error message if the index does not exist or the new key is smaller than the current key.
-    pub fn increase_key(&mut self, mut i: usize, key: i32) {
+    pub fn increase_key(&mut self, mut i: usize, key: i32, quiet: bool) {
 
         // Check if the index exists and if the new key is smaller than the current key
         match self.nodes.get(i) {
@@ -117,22 +113,19 @@ impl Dheap {
             None => { return eprintln!("The index '{i}' doesn't exist in the heap!") }
         }
 
+        if !quiet { println!("Increased index [{}] from [{}] to [{}]", i, self.nodes[i], key) }
         self.nodes[i] = key;
-
-        // If the node is the root, return early
-        // as no further action is needed and parent cannot be calculated
-        if i == 0 { return }
-
-        let i_parent = self.parent_of(i);
 
         // Loop to adjust the heap: move the node up the tree as long as
         // it is larger than its parent
-        while i > 0 && self.nodes[i_parent] < self.nodes[i] {
+        while i > 0 && self.nodes[i] > self.nodes[self.parent_of(i)] {
+
             // Swap the current node with its parent
-            self.nodes.swap(i, i_parent);
+            let parent = self.parent_of(i);
+            self.nodes.swap(i, parent);
 
             // Update the index to that of the parent for the next iteration
-            i = i_parent;
+            i = parent;
         }
     }
 
@@ -146,7 +139,8 @@ impl Dheap {
             .interact_text()
             .unwrap();
         self.nodes.push(i32::MIN); // equivalent to adding negative infinity
-        self.increase_key(self.nodes.len() - 1, key);
+        println!("Inserted: [{key}]");
+        self.increase_key(self.nodes.len() - 1, key, true);
     }
 
     /// Deletes a node from the max-heap at a given index.
@@ -164,8 +158,10 @@ impl Dheap {
             return eprintln!("The index '{i}' doesn't exist in the heap!")
         }
         
+        println!("Deleted index [{i}] with value [{}]", self.nodes[i]);
+
         // Replace the node with infinity, thus bringing him to the top of the node
-        self.increase_key(i, i32::MAX);
+        self.increase_key(i, i32::MAX, true);
 
         // Now, let's swap the first and the last nodes
         let len = self.nodes.len();
@@ -176,35 +172,38 @@ impl Dheap {
 
         // And make sure we maintain the max-heap property
         self.max_heapify(0);
-    }
-}
 
-// Make the d-ary heap printable
-impl std::fmt::Display for Dheap {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let mut level_start = 0;
-        let mut nodes_at_level = 1;
+    }
+
+    /// Prints the heap in a structured format.
+    ///
+    /// Outputs each level of the heap in a parenthesized, comma-separated format.
+    /// The nodes at each level are enclosed in parentheses and separated by commas.
+    pub fn print(&self) {
+        let mut level_start = 0; // Start index of the current level
+        let mut nodes_at_level = 1; // Number of nodes at the current level, starts with 1 for the root
 
         while level_start < self.nodes.len() {
-            let level_end = min(level_start + nodes_at_level, self.nodes.len());
+            let level_end = std::cmp::min(level_start + nodes_at_level, self.nodes.len()); // End index of the current level
 
-            write!(f, "(")?;
+            // Print the nodes at the current level
+            print!("(");
             for i in level_start..level_end {
-                if i > level_start {
-                    write!(f, ",")?;
+                print!("{}", self.nodes[i]);
+                if i < level_end - 1 {
+                    print!(","); // Separate nodes with a comma
                 }
-                write!(f, "{}", self.nodes[i])?;
             }
-            write!(f, ")")?;
+            print!(")");
 
             if level_end < self.nodes.len() {
-                writeln!(f)?;
+                println!(); // New line after each level, except the last
             }
 
-            level_start = level_end;
-            nodes_at_level *= self.d;
+            // Update for the next level
+            level_start = level_end; // Move to the next level
+            nodes_at_level *= self.d; // Increase the number of nodes at the next level
         }
-
-        Ok(())
+        println!(); // New line at the end for clean separation
     }
 }
