@@ -146,8 +146,7 @@ impl Dheap {
     /// Deletes a node from the max-heap at a given index.
     ///
     /// Prompts the user to enter the index of the node to be deleted. Replaces the node at this
-    /// index with the maximum integer value, moves it to the top, and then removes it. Ensures
-    /// the heap maintains max-heap property after deletion.
+    /// index with the maximum integer value, moves it to the top, and then removes it using Extract-Max
     pub fn delete(&mut self) {
         // Prompt the user
         let i: usize = Input::new()
@@ -163,15 +162,8 @@ impl Dheap {
         // Replace the node with infinity, thus bringing him to the top of the node
         self.increase_key(i, i32::MAX, true);
 
-        // Now, let's swap the first and the last nodes
-        let len = self.nodes.len();
-        self.nodes.swap(0, len - 1);
-
-        // Now, the key we wanted to remove is the last node, we'll delete it
-        self.nodes.pop();
-
-        // And make sure we maintain the max-heap property
-        self.max_heapify(0);
+        // apply 'Extract Max' to delete the top node
+        self.extract_max();
 
     }
 
