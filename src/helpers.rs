@@ -12,6 +12,13 @@ pub fn clear_screen() {
     }
 }
 
+pub fn is_positive(s: &str) -> Result<usize, String> {
+    match s.parse::<usize>() {
+        Ok(n) if n > 0 => Ok(n),
+        _ => Err(String::from("The value for 'd' must be a number greater than 0")),
+    }
+}
+
 pub fn parse_file_to_nodes(path: PathBuf) -> Result<Vec<i32>>{
     // Read the data from the file
     let file_data = read_to_string(path).context("Unable to read the list file.")?;

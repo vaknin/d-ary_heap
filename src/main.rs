@@ -3,7 +3,7 @@ use clap::Parser;
 use anyhow::Result;
 use consts::*;
 use dheap::Dheap;
-use helpers::{increase_key_prompt, main_menu, prompt_filepath};
+use helpers::{increase_key_prompt, is_positive, main_menu, prompt_filepath};
 use crate::helpers::{clear_screen, parse_file_to_nodes};
 
 mod helpers;
@@ -14,7 +14,7 @@ mod dheap;
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// What's the "d" of the heap, i.e. how many children can each node have?
-    #[arg(short, value_name = "max-nodes")]
+    #[arg(short, value_name = "max-nodes", value_parser=is_positive)]
     d: usize,
 
     /// The optional path to the comma separated list of numbers, e.g.: 2,3,4,5
