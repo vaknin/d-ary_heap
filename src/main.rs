@@ -1,3 +1,10 @@
+/// This function is the entry point for a program that demonstrates the implementation
+/// and manipulation of a d-ary heap, a versatile data structure extending the binary heap concept.
+/// It parses command-line arguments to configure the heap's branching factor and initial data.
+/// The program features an interactive menu that allows users to perform operations like insert,
+/// delete, extract-max, and view the heap. It efficiently manages heap operations and
+/// user interactions, leveraging Rust's robustness and performance.
+
 use std::path::PathBuf;
 use clap::Parser;
 use anyhow::Result;

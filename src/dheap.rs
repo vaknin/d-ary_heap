@@ -131,7 +131,7 @@ impl Dheap {
 
     /// Inserts a new node into the max-heap.
     ///
-    /// Prompts the user for a key to insert. Adds a new node with the minimum integer value (negative infinity) 
+    /// Prompts the user for a key to insert. Adds a new node with the minimum integer value
     /// and then increases its key to the user-provided value, maintaining the max-heap property.
     pub fn insert(&mut self) {
         let key: i32 = Input::new()
@@ -162,7 +162,7 @@ impl Dheap {
         // Replace the node with infinity, thus bringing him to the top of the node
         self.increase_key(i, i32::MAX, true);
 
-        // apply 'Extract Max' to delete the top node
+        // Apply 'Extract Max' to delete the top node
         self.extract_max();
 
     }
